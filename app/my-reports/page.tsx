@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { AlertTriangle, Clock, CheckCircle2, XCircle, PlusCircle, ArrowLeft } from 'lucide-react'
+import { AlertTriangle, Clock, CheckCircle2, XCircle, PlusCircle, LogIn } from 'lucide-react'
 
 export default async function MyReportsPage() {
   const supabase = await createClient()
@@ -9,12 +9,33 @@ export default async function MyReportsPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Fetch barrier reports for this user or demo fallback
+  if (!user) {
+    return (
+      <div className="max-w-md mx-auto px-4 py-20 text-center">
+        <div className="p-8 rounded-3xl glass space-y-4">
+          <AlertTriangle className="w-10 h-10 text-amber-500 mx-auto" />
+          <h1 className="text-xl font-bold">Sign In to View Your Reports</h1>
+          <p className="text-xs text-neutral-500">
+            Please sign in to track the verification status of your reported barriers.
+          </p>
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all"
+          >
+            <LogIn className="w-4 h-4" />
+            <span>Sign In</span>
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  // Fetch real barrier reports submitted by this authenticated user
   const { data: reports } = await supabase
     .from('barrier_reports')
     .select('*')
+    .eq('reporter_id', user.id)
     .order('created_at', { ascending: false })
-    .limit(20)
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 w-full">
@@ -59,24 +80,30 @@ export default async function MyReportsPage() {
                   {report.status === 'verified' && (
                     <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600">
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Verified by Moderator</span>
+                      <span>Verified & Active</span>
                     </span>
                   )}
                   {report.status === 'pending' && (
                     <span className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-600">
                       <Clock className="w-3.5 h-3.5" />
-                      <span>Under Review</span>
+                      <span>In Review</span>
+                    </span>
+                  )}
+                  {report.status === 'rejected' && (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-rose-600">
+                      <XCircle className="w-3.5 h-3.5" />
+                      <span>Declined</span>
                     </span>
                   )}
                   {report.status === 'resolved' && (
                     <span className="inline-flex items-center gap-1 text-[11px] font-medium text-blue-600">
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Hazard Resolved</span>
+                      <span>Municipal Repair Completed</span>
                     </span>
                   )}
                 </div>
 
-                <p className="text-xs sm:text-sm font-medium text-neutral-800 dark:text-neutral-200">
+                <p className="text-sm font-medium text-neutral-900 dark:text-white">
                   {report.description}
                 </p>
 
@@ -86,7 +113,7 @@ export default async function MyReportsPage() {
               </div>
 
               {report.image_url && (
-                <div className="shrink-0 w-16 h-16 rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800">
+                <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-neutral-200 dark:border-neutral-800">
                   <img
                     src={report.image_url}
                     alt="Barrier evidence"
