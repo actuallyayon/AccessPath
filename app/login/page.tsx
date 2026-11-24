@@ -201,6 +201,62 @@ export default function LoginPage() {
                 <span>Sign In</span>
               )}
             </button>
+
+            {/* Quick 1-Click Demo Login Buttons */}
+            <div className="pt-4 border-t border-neutral-200/60 dark:border-neutral-800/60">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-2.5 text-center">
+                Instant Demo Access (1-Click Fill)
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('admin@accesspath.demo')
+                    setPassword('AccessPassword123!')
+                  }}
+                  className="p-2.5 rounded-xl border border-purple-500/20 bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 text-xs font-bold text-left transition-all cursor-pointer"
+                >
+                  <p className="font-extrabold text-[11px]">Admin</p>
+                  <p className="text-[10px] opacity-75 truncate">Full analytics & controls</p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('moderator@accesspath.demo')
+                    setPassword('AccessPassword123!')
+                  }}
+                  className="p-2.5 rounded-xl border border-blue-500/20 bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 dark:text-blue-300 text-xs font-bold text-left transition-all cursor-pointer"
+                >
+                  <p className="font-extrabold text-[11px]">Moderator</p>
+                  <p className="text-[10px] opacity-75 truncate">Audit queues & verify</p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('contributor@accesspath.demo')
+                    setPassword('AccessPassword123!')
+                  }}
+                  className="p-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs font-bold text-left transition-all cursor-pointer"
+                >
+                  <p className="font-extrabold text-[11px]">Contributor</p>
+                  <p className="text-[10px] opacity-75 truncate">Add places & hazards</p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('user@accesspath.demo')
+                    setPassword('AccessPassword123!')
+                  }}
+                  className="p-2.5 rounded-xl border border-neutral-300/60 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 text-neutral-800 dark:text-neutral-200 text-xs font-bold text-left transition-all cursor-pointer"
+                >
+                  <p className="font-extrabold text-[11px]">Regular User</p>
+                  <p className="text-[10px] opacity-75 truncate">Route planning & reviews</p>
+                </button>
+              </div>
+            </div>
           </form>
         )}
 
