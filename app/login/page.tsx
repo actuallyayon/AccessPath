@@ -9,17 +9,17 @@ import { createClient } from '@/lib/supabase/client'
 export default function LoginPage() {
   const router = useRouter()
   const [tab, setTab] = useState<'signin' | 'signup'>('signin')
-  
+
   // Sign In state
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  
+
   // Sign Up state
   const [signUpFullName, setSignUpFullName] = useState('')
   const [signUpEmail, setSignUpEmail] = useState('')
   const [signUpPassword, setSignUpPassword] = useState('')
   const [signUpRole, setSignUpRole] = useState<'user' | 'contributor'>('user')
-  
+
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
   const [successMsg, setSuccessMsg] = useState('')
@@ -41,10 +41,7 @@ export default function LoginPage() {
         setErrorMsg(error.message)
       } else {
         setSuccessMsg('Successfully signed in! Redirecting...')
-        setTimeout(() => {
-          router.push('/explore')
-          router.refresh()
-        }, 800)
+        window.location.href = '/explore'
       }
     } catch (err: any) {
       setErrorMsg(err.message || 'Login failed')
@@ -81,10 +78,7 @@ export default function LoginPage() {
             : 'Account registered! You can now sign in with your credentials.'
         )
         if (data?.session) {
-          setTimeout(() => {
-            router.push('/explore')
-            router.refresh()
-          }, 1000)
+          window.location.href = '/explore'
         } else {
           setTab('signin')
           setEmail(signUpEmail)
@@ -105,22 +99,20 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => { setTab('signin'); setErrorMsg(''); setSuccessMsg(''); }}
-            className={`flex-1 py-2 rounded-full font-bold text-xs transition-all cursor-pointer ${
-              tab === 'signin'
-                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm'
-                : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
-            }`}
+            className={`flex-1 py-2 rounded-full font-bold text-xs transition-all cursor-pointer ${tab === 'signin'
+              ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm'
+              : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+              }`}
           >
             Sign In
           </button>
           <button
             type="button"
             onClick={() => { setTab('signup'); setErrorMsg(''); setSuccessMsg(''); }}
-            className={`flex-1 py-2 rounded-full font-bold text-xs transition-all cursor-pointer ${
-              tab === 'signup'
-                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm'
-                : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
-            }`}
+            className={`flex-1 py-2 rounded-full font-bold text-xs transition-all cursor-pointer ${tab === 'signup'
+              ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm'
+              : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+              }`}
           >
             Create New Account
           </button>
@@ -323,22 +315,20 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setSignUpRole('user')}
-                  className={`p-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                    signUpRole === 'user'
-                      ? 'border-emerald-500 bg-emerald-500/15 text-emerald-800 dark:text-emerald-300'
-                      : 'border-neutral-200/50 glass text-neutral-600 dark:text-neutral-400'
-                  }`}
+                  className={`p-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${signUpRole === 'user'
+                    ? 'border-emerald-500 bg-emerald-500/15 text-emerald-800 dark:text-emerald-300'
+                    : 'border-neutral-200/50 glass text-neutral-600 dark:text-neutral-400'
+                    }`}
                 >
                   Regular User
                 </button>
                 <button
                   type="button"
                   onClick={() => setSignUpRole('contributor')}
-                  className={`p-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                    signUpRole === 'contributor'
-                      ? 'border-emerald-500 bg-emerald-500/15 text-emerald-800 dark:text-emerald-300'
-                      : 'border-neutral-200/50 glass text-neutral-600 dark:text-neutral-400'
-                  }`}
+                  className={`p-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${signUpRole === 'contributor'
+                    ? 'border-emerald-500 bg-emerald-500/15 text-emerald-800 dark:text-emerald-300'
+                    : 'border-neutral-200/50 glass text-neutral-600 dark:text-neutral-400'
+                    }`}
                 >
                   Contributor
                 </button>

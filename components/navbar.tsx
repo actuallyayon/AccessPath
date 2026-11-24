@@ -10,6 +10,8 @@ import {
   ShieldCheck, 
   PlusCircle, 
   LogIn, 
+  LogOut,
+  User,
   LayoutDashboard,
   Compass,
   Sparkles,
@@ -21,24 +23,64 @@ import { createClient } from '@/lib/supabase/client'
 export function Navbar({ userRole: initialRole }: { userRole?: string | null }) {
   const pathname = usePathname()
   const [userRole, setUserRole] = useState<string | null>(initialRole || null)
+  const [currentUser, setCurrentUser] = useState<any>(null)
 
   useEffect(() => {
-    async function checkUser() {
-      try {
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
+    const supabase = createClient()
+
+    async function loadUser(userObj: any) {
+      if (userObj) {
+        setCurrentUser(userObj)
+        try {
           const { data: profile } = await supabase
             .from('profiles')
             .select('role')
-            .eq('id', user.id)
+            .eq('id', userObj.id)
             .single()
-          if (profile) setUserRole(profile.role)
+          if (profile?.role) {
+            setUserRole(profile.role)
+          } else if (userObj.user_metadata?.role) {
+            setUserRole(userObj.user_metadata.role)
+          }
+        } catch {
+          if (userObj.user_metadata?.role) {
+            setUserRole(userObj.user_metadata.role)
+          }
         }
-      } catch {}
+      } else {
+        setCurrentUser(null)
+        setUserRole(null)
+      }
     }
-    checkUser()
+
+    // Initial check
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      loadUser(user)
+    })
+
+    // Real-time listener for login/logout across tabs & actions
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        loadUser(session?.user ?? null)
+      }
+    )
+
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [])
+
+  const handleSignOut = async () => {
+    try {
+      const supabase = createClient()
+      await supabase.auth.signOut()
+      setCurrentUser(null)
+      setUserRole(null)
+      window.location.href = '/'
+    } catch {
+      window.location.href = '/'
+    }
+  }
 
   const navLinks = [
     { href: '/explore', label: 'Explore Places', icon: MapPin },
@@ -120,13 +162,40 @@ export function Navbar({ userRole: initialRole }: { userRole?: string | null }) 
 
           <ThemeToggle />
 
-          <Link
-            href="/login"
-            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 hover:scale-102 transition-all"
-          >
-            <LogIn className="w-3.5 h-3.5" />
-            <span>Sign In</span>
-          </Link>
+          {/* Conditional Auth Button / User Profile */}
+          {currentUser ? (
+            <div className="flex items-center gap-2">
+              <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-100 dark:bg-neutral-800/80 border border-neutral-200/80 dark:border-neutral-700/80 text-xs font-semibold">
+                <User className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span className="max-w-[100px] truncate">
+                  {currentUser.email?.split('@')[0]}
+                </span>
+                {userRole && (
+                  <span className="ml-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
+                    {userRole}
+                  </span>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-neutral-200/80 hover:bg-neutral-300 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 font-bold text-xs transition-all cursor-pointer"
+                title="Sign Out"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Sign Out</span>
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 hover:scale-102 transition-all"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span>Sign In</span>
+            </Link>
+          )}
         </div>
       </div>
     </header>
